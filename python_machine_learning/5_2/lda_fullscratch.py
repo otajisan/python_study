@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding:utf-8
 
-import os
 import pandas as pd
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import StandardScaler
