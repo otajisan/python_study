@@ -5,6 +5,7 @@
 import sys, os
 import pickle
 import numpy as np
+import matplotlib.pylab as plt
 
 sys.path.append(os.pardir)
 
@@ -61,7 +62,8 @@ def get_test_data():
     '''
     MNISTデータセットのうち、テストデータを返す
     '''
-    (x_train, t_train), (x_test, t_test) = load_mnist(flatten=True, normalize=False)
+    # ここでは、normalize=Trueとしてデータを正規化(前処理：pre-processing)
+    (x_train, t_train), (x_test, t_test) = load_mnist(flatten=True, normalize=True)
     return x_test, t_test
 
 def init_network():
@@ -93,10 +95,33 @@ def predict(network, x):
 
     return y
 
+def confirm_shape():
+    '''
+    3.6.3 バッチ処理
+    ここでは各入力データと重みパラメータの形状を確認
+    '''
+    x, _ = get_test_data()
+    network = init_network()
+    W1, W2, W3 = network['W1'], network['W2'], network['W3']
+    print('>>> 3.6.3 バッチ処理')
+    print(x.shape)
+    print(x[0].shape)
+    print(W1.shape)
+    print(W2.shape)
+    print(W3.shape)
+
+def print_chart(x, y):
+    '''
+    結果をグラフ出力する
+    '''
+    plt.plot(x, y)
+    # y軸の範囲指定
+    plt.ylim(-0.1, 1.1)
+    plt.show()
 
 if __name__ == '__main__':
     # MNISTデータセットの内容確認
-    #confirm_data()
+    confirm_data()
     # 推論
     x, t = get_test_data()
     network = init_network()
@@ -106,4 +131,22 @@ if __name__ == '__main__':
         p = np.argmax(y) # 最も確率の高い要素のインデックスを取得
         if p == t[i]:
             accuracy_cnt += 1
+    print("Accuracy:" + str(float(accuracy_cnt) / len(x)))
+
+    # 3.6.3 バッチ処理
+    confirm_shape()
+    x, t = get_test_data()
+    network = init_network()
+    batch_size = 100
+    accuracy_cnt = 0
+    # 要は「100個ずつ処理する」ということ
+    # まとめて処理(まとまった入力データのことをbatchと呼ぶ)することで、
+    # 処理速度を圧倒的に上げることができる
+    for i in range(0, len(x), batch_size):
+        x_batch = x[i:i + batch_size]
+        y_batch = predict(network, x_batch)
+        # axis=1 -> 100x10の配列の中で、
+        # 1次元目の要素ごとに最大値のインデックスを見つけることを指定
+        p = np.argmax(y_batch, axis=1)
+        accuracy_cnt += np.sum(p == t[i:i + batch_size])
     print("Accuracy:" + str(float(accuracy_cnt) / len(x)))
