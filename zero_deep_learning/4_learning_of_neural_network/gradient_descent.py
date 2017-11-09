@@ -57,7 +57,9 @@ if __name__ == '__main__':
     grad = numerical_gradient(multi_param_func, x)
     print(grad)
     # 勾配硬化法
-    lr = 0.1
+    lr = 10.0 # 学習率が大きすぎる場合
+    lr = 1e-10 # 学習率が小さすぎる場合
+    lr = 0.1 # 適切な学習率(この関数の場合の真の最小値(0,0)に限りなく近い結果([ -6.11110793e-10   8.14814391e-10])が出る)
     result = gradient_descent(multi_param_func, init_x=np.array(x), lr=lr, step_num=100)
     print(result)
 
