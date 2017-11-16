@@ -21,6 +21,7 @@ class simpleNet:
         y = self.softmax(z)
         loss = self.cross_entropy_error(y, t)
 
+        print('loss:', loss)
         return loss
 
 #    def cross_entropy_error(self, y, t):
